@@ -106,9 +106,68 @@ class TeslianConnectClient:
             "",
         )
 
+        timeout_raw = config.get_param(
+            "teslian_connect.timeout",
+            "120",
+        )
+
+        try:
+            timeout = int(timeout_raw)
+        except (TypeError, ValueError):
+            timeout = 120
+
         return cls(
             base_url=base_url,
             api_key=api_key or None,
+            timeout=timeout,
         )
+    def health(self) -> dict[str, Any]:
+        """
+        Verifica disponibilidad de TESLIAN CONNECT.
+        """
 
+        url = f"{self.base_url}/health"
+
+        headers = {
+            "Accept": "application/json",
+        }
+
+        if self.api_key:
+            headers["Authorization"] = (
+                f"Bearer {self.api_key}"
+            )
+
+        try:
+            response = requests.get(
+                url,
+                headers=headers,
+                timeout=min(self.timeout, 30),
+            )
+
+        except requests.RequestException as exc:
+            raise TeslianConnectError(
+                f"No fue posible conectar con TESLIAN CONNECT: {exc}"
+            ) from exc
+
+        if not response.ok:
+            raise TeslianConnectError(
+                "TESLIAN CONNECT respondió con error. "
+                f"HTTP {response.status_code}: "
+                f"{response.text[:500]}"
+            )
+
+        try:
+            result = response.json()
+
+        except ValueError as exc:
+            raise TeslianConnectError(
+                "TESLIAN CONNECT respondió con contenido no JSON."
+            ) from exc
+
+        if not isinstance(result, dict):
+            raise TeslianConnectError(
+                "Respuesta inesperada de TESLIAN CONNECT."
+            )
+
+        
         return result

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+    <record
+        id="res_config_settings_view_form_teslian"
+        model="ir.ui.view"
+    >
+
+        <field name="name">
+            res.config.settings.view.form.teslian
+        </field>
+
+        <field name="model">
+            res.config.settings
+        </field>
+
+        <field
+            name="inherit_id"
+            ref="base.res_config_settings_view_form"
+        />
+
+        <field name="arch" type="xml">
+
+            <xpath
+                expr="//form"
+                position="inside"
+            >
+
+                <app
+                    string="TESLIAN"
+                    name="teslian_connect"
+                >
+
+                    <block
+                        title="TESLIAN CONNECT"
+                        name="teslian_connect_configuration"
+                    >
+
+                        <setting
+                            string="URL del servicio"
+                            help="Dirección base de TESLIAN CONNECT."
+                        >
+
+                            <field name="teslian_connect_base_url"/>
+
+                        </setting>
+
+
+                        <setting
+                            string="API Key"
+                            help="Credencial utilizada por Odoo para consumir TESLIAN CONNECT."
+                        >
+
+                            <field
+                                name="teslian_connect_api_key"
+                                password="True"
+                            />
+
+                        </setting>
+
+
+                        <setting
+                            string="Timeout"
+                            help="Tiempo máximo de espera en segundos."
+                        >
+
+                            <field name="teslian_connect_timeout"/>
+
+                        </setting>
+
+                        <setting
+                            string="Prueba de conexión"
+                            help="Verifica la comunicación entre Odoo y TESLIAN CONNECT."
+                        >
+
+                            <button
+                                name="action_test_teslian_connect"
+                                type="object"
+                                string="Probar conexión"
+                                class="btn-primary"
+                            />
+
+                        </setting>
+
+                    </block>
+
+                </app>
+
+            </xpath>
+
+        </field>
+
+    </record>
+
+</odoo>

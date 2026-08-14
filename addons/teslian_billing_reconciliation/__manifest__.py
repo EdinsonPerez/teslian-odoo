@@ -29,6 +29,7 @@ de TESLIAN CONNECT antes de habilitar la facturación.
         "security/ir.model.access.csv",
         "views/teslian_asset_views.xml",
         "views/res_partner_views.xml",
+        "views/res_config_settings_views.xml",
     ],
 
     "installable": True,
