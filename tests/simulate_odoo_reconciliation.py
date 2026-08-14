@@ -102,6 +102,16 @@ def main() -> None:
                     "plate": None,
                     "active": True,
                 },
+
+                {
+                    "odoo_id": 9,
+                    "external_id": "266797",
+                    "name": "Activo 9",
+                    "imei": None,
+                    "plate": None,
+                    "active": True,
+                },
+
                 
             ],
         },

@@ -30,19 +30,14 @@
                 <page string="TESLIAN / RED GPS">
 
                     <group>
-
-                        <group string="Integración">
+                        <group string="Integración RED GPS">
 
                             <field name="redgps_client_id"/>
 
                             <field
                                 name="teslian_billing_status"
-                                readonly="1"
-                            />
-
-                            <field
-                                name="teslian_can_invoice"
-                                readonly="1"
+                                widget="statusbar"
+                                statusbar_visible="not_checked,matched,review,error"
                             />
 
                             <field
@@ -52,22 +47,73 @@
 
                         </group>
 
+                        <group string="Facturación">
 
-                        <group string="Acciones">
+                            <field
+                                name="teslian_can_invoice"
+                                readonly="1"
+                            />
 
-                            <button
-                                name="action_teslian_reconcile"
-                                type="object"
-                                string="Validar con RED GPS"
-                                class="btn-primary"
+                            <field
+                                name="teslian_odoo_asset_count"
+                                readonly="1"
+                            />
+
+                            <field
+                                name="teslian_redgps_asset_count"
+                                readonly="1"
+                            />
+
+                            <field
+                                name="teslian_reconciliation_difference"
+                                readonly="1"
                             />
 
                         </group>
+                    </group>
+
+
+                    <div
+                        class="alert alert-danger"
+                        role="alert"
+                        invisible="teslian_billing_status != 'review'"
+                    >
+                        <strong>
+                            Facturación bloqueada.
+                        </strong>
+
+                        Se detectaron diferencias entre Odoo y RED GPS.
+                        El cliente requiere revisión manual antes de facturar.
+                    </div>
+
+
+                    <div
+                        class="alert alert-success"
+                        role="alert"
+                        invisible="teslian_billing_status != 'matched'"
+                    >
+                        <strong>
+                            Conciliación correcta.
+                        </strong>
+
+                        La información coincide con RED GPS.
+                        El cliente está habilitado para facturación.
+                    </div>
+
+
+                    <group string="Acciones">
+
+                        <button
+                            name="action_teslian_reconcile"
+                            type="object"
+                            tring="Validar con RED GPS"
+                            class="btn-primary"
+                        />
 
                     </group>
 
 
-                    <group string="Resultado">
+                    <group string="Resultado de conciliación">
 
                         <field
                             name="teslian_reconciliation_message"
@@ -77,11 +123,13 @@
                         <field
                             name="teslian_missing_in_redgps"
                             readonly="1"
+                            invisible="not teslian_missing_in_redgps"
                         />
 
                         <field
                             name="teslian_missing_in_odoo"
                             readonly="1"
+                            invisible="not teslian_missing_in_odoo"
                         />
 
                     </group>
@@ -103,12 +151,16 @@
 
                             <field name="operational"/>
 
+                            <field
+                                name="last_reconciliation_status"
+                                readonly="1"
+                            />
+
                         </list>
 
                     </field>
 
                 </page>
-
             </xpath>
 
         </field>

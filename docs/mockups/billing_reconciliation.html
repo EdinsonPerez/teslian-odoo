@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>TESLIAN / RED GPS - Mock Odoo</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+            background: #f6f7f9;
+            color: #2f3136;
+        }
+
+        .topbar {
+            height: 56px;
+            background: #714b67;
+            color: white;
+
+            display: flex;
+            align-items: center;
+
+            padding: 0 24px;
+
+            font-weight: 600;
+        }
+
+        .topbar .brand {
+            margin-right: 40px;
+        }
+
+        .topbar nav {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+        }
+
+        .page {
+            max-width: 1250px;
+            margin: 30px auto;
+            padding: 0 24px;
+        }
+
+        .breadcrumb {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e4e4e4;
+            border-radius: 8px;
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .customer-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .customer-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 500;
+        }
+
+        .customer-header p {
+            margin: 6px 0 0;
+            color: #777;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+
+            padding: 0 28px;
+
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab {
+            padding: 15px 18px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .tab.active {
+            color: #714b67;
+            font-weight: 600;
+            border-bottom: 3px solid #714b67;
+        }
+
+        .content {
+            padding: 26px 28px;
+        }
+
+        .columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 35px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+
+            border-bottom: 1px solid #ddd;
+
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+
+        .field {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+
+            align-items: center;
+
+            min-height: 42px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .field label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .field strong {
+            font-size: 14px;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+
+            width: fit-content;
+
+            border-radius: 14px;
+            padding: 5px 11px;
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status.matched {
+            background: #dcf5e7;
+            color: #17663a;
+        }
+
+        .status.review {
+            background: #fde6e6;
+            color: #a32626;
+        }
+
+        .status.pending {
+            background: #fff2cd;
+            color: #80600c;
+        }
+
+        .alert {
+            margin-top: 28px;
+            padding: 16px 18px;
+
+            border-radius: 6px;
+            border: 1px solid;
+        }
+
+        .alert.success {
+            background: #eef9f2;
+            color: #215c38;
+            border-color: #bfe5cd;
+        }
+
+        .alert.danger {
+            background: #fff1f1;
+            color: #8a2626;
+            border-color: #efc0c0;
+        }
+
+        .alert strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+
+            margin: 25px 0;
+        }
+
+        button {
+            border: 0;
+            border-radius: 5px;
+
+            padding: 10px 17px;
+
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #714b67;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #eeeeee;
+            color: #444;
+        }
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            margin-top: 12px;
+
+            font-size: 14px;
+        }
+
+        th {
+            background: #f7f7f7;
+            text-align: left;
+            color: #666;
+
+            padding: 11px;
+
+            border-bottom: 1px solid #ddd;
+        }
+
+        td {
+            padding: 11px;
+
+            border-bottom: 1px solid #eee;
+        }
+
+        .yes {
+            color: #1d7141;
+            font-weight: 600;
+        }
+
+        .footer-note {
+            color: #999;
+            font-size: 12px;
+
+            margin-top: 18px;
+        }
+
+        @media (max-width: 800px) {
+            .columns {
+                grid-template-columns: 1fr;
+            }
+
+            .field {
+                grid-template-columns: 1fr;
+                gap: 4px;
+                padding: 8px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="topbar">
+    <div class="brand">
+        Seguimiento Global
+    </div>
+
+    <nav>
+        <span>CRM</span>
+        <span>Ventas</span>
+        <span>Facturación</span>
+        <span>Inventario</span>
+        <span>Contactos</span>
+    </nav>
+</div>
+
+
+<div class="page">
+
+    <div class="breadcrumb">
+        Contactos / Cliente Demo
+    </div>
+
+
+    <div class="card">
+
+        <div class="customer-header">
+            <h1>Cliente Demo</h1>
+
+            <p>
+                Cliente · Seguimiento Global
+            </p>
+        </div>
+
+
+        <div class="tabs">
+            <div class="tab">
+                Contactos y direcciones
+            </div>
+
+            <div class="tab">
+                Ventas y compras
+            </div>
+
+            <div class="tab active">
+                TESLIAN / RED GPS
+            </div>
+        </div>
+
+
+        <div class="content">
+
+            <div class="columns">
+
+                <div>
+                    <div class="section-title">
+                        Integración RED GPS
+                    </div>
+
+                    <div class="field">
+                        <label>ID Cliente RED GPS</label>
+                        <strong>39348</strong>
+                    </div>
+
+                    <div class="field">
+                        <label>Estado conciliación</label>
+
+                        <span
+                            id="status"
+                            class="status matched"
+                        >
+                            VALIDADO
+                        </span>
+                    </div>
+
+                    <div class="field">
+                        <label>Última conciliación</label>
+                        <strong>13/08/2026 23:00</strong>
+                    </div>
+                </div>
+
+
+                <div>
+                    <div class="section-title">
+                        Facturación
+                    </div>
+
+                    <div class="field">
+                        <label>Habilitado para facturar</label>
+                        <strong id="canInvoice">
+                            Sí
+                        </strong>
+                    </div>
+
+                    <div class="field">
+                        <label>Activos Odoo</label>
+                        <strong id="odooCount">
+                            9
+                        </strong>
+                    </div>
+
+                    <div class="field">
+                        <label>Activos RED GPS</label>
+                        <strong id="redgpsCount">
+                            9
+                        </strong>
+                    </div>
+
+                    <div class="field">
+                        <label>Diferencia</label>
+                        <strong id="difference">
+                            0
+                        </strong>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div
+                id="successAlert"
+                class="alert success"
+            >
+                <strong>
+                    Conciliación correcta
+                </strong>
+
+                La información registrada en Odoo coincide
+                con RED GPS. El cliente está habilitado
+                para facturación.
+            </div>
+
+
+            <div
+                id="dangerAlert"
+                class="alert danger"
+                style="display:none;"
+            >
+                <strong>
+                    ⚠ FACTURACIÓN BLOQUEADA
+                </strong>
+
+                Se detectaron diferencias entre Odoo
+                y RED GPS. Se requiere revisión manual
+                antes de continuar con la facturación.
+            </div>
+
+
+            <div class="actions">
+
+                <button
+                    class="btn-primary"
+                    onclick="validateRealMatch()"
+                >
+                    Validar con RED GPS
+                </button>
+
+                <button
+                    class="btn-secondary"
+                    onclick="validateRealMismatch()"
+                >
+                    Probar discrepancia
+                </button>
+
+            </div>
+
+
+            <div class="section-title">
+                Activos operativos
+            </div>
+
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Activo</th>
+                        <th>ID RED GPS</th>
+                        <th>IMEI</th>
+                        <th>Placa</th>
+                        <th>Operativo</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    <tr>
+                        <td>Activo 01</td>
+                        <td>158063</td>
+                        <td>•••••••••••••••</td>
+                        <td>AB123CD</td>
+                        <td class="yes">Sí</td>
+                        <td>Coincide</td>
+                    </tr>
+
+                    <tr>
+                        <td>Activo 02</td>
+                        <td>158121</td>
+                        <td>•••••••••••••••</td>
+                        <td>AC456EF</td>
+                        <td class="yes">Sí</td>
+                        <td>Coincide</td>
+                    </tr>
+
+                    <tr>
+                        <td>Activo 03</td>
+                        <td>158167</td>
+                        <td>•••••••••••••••</td>
+                        <td>AD789GH</td>
+                        <td class="yes">Sí</td>
+                        <td>Coincide</td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+
+            <div class="footer-note">
+                Mock visual TESLIAN GROUP.
+                Esta pantalla representa la experiencia
+                prevista para el módulo Odoo.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const TESLIAN_CONNECT_URL = "http://127.0.0.1:8000";
+
+
+const payloadMatched = {
+    client: {
+        odoo_id: 157,
+        external_id: "39348",
+        name: "Cliente Demo",
+        active: true,
+        assets: [
+            {
+                odoo_id: 1,
+                external_id: "158063",
+                name: "Activo 1",
+                imei: null,
+                plate: null,
+                active: true
+            },
+            {
+                odoo_id: 2,
+                external_id: "158121",
+                name: "Activo 2",
+                imei: null,
+                plate: null,
+                active: true
+            },
+            {
+                odoo_id: 3,
+                external_id: "158167",
+                name: "Activo 3",
+                imei: null,
+                plate: null,
+                active: true
+            },
+            {
+                odoo_id: 4,
+                external_id: "158198",
+                name: "Activo 4",
+                imei: null,
+                plate: null,
+                active: true
+            },
+            {
+                odoo_id: 5,
+                external_id: "158223",
+                name: "Activo 5",
+                imei: null,
+                plate: null,
+                active: true
+            },
+            {
+                odoo_id: 6,
+                external_id: "158230",
+                name: "Activo 6",
+                imei: null,
+                plate: null,
+                active: true
+            },
+            {
+                odoo_id: 7,
+                external_id: "158251",
+                name: "Activo 7",
+                imei: null,
+                plate: null,
+                active: true
+            },
+            {
+                odoo_id: 8,
+                external_id: "158400",
+                name: "Activo 8",
+                imei: null,
+                plate: null,
+                active: true
+            },
+            {
+                odoo_id: 9,
+                external_id: "266797",
+                name: "Activo 9",
+                imei: null,
+                plate: null,
+                active: true
+            }
+        ]
+    },
+    billing_period: "2026-08"
+};
+
+
+const payloadMismatch = {
+    client: {
+        ...payloadMatched.client,
+
+        // Quitamos intencionalmente un activo
+        // para demostrar el bloqueo de facturación.
+        assets: payloadMatched.client.assets.slice(0, 8)
+    },
+
+    billing_period: "2026-08"
+};
+
+
+async function reconcile(payload) {
+
+    setLoadingState(true);
+
+    try {
+
+        const response = await fetch(
+            `${TESLIAN_CONNECT_URL}/api/v1/billing/reconcile`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(payload)
+            }
+        );
+
+
+        if (!response.ok) {
+
+            const errorText = await response.text();
+
+            throw new Error(
+                `TESLIAN CONNECT respondió HTTP `
+                + `${response.status}: ${errorText}`
+            );
+        }
+
+
+        const result = await response.json();
+
+        updateUI(result);
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        showConnectionError(
+            error.message
+        );
+
+    }
+    finally {
+
+        setLoadingState(false);
+
+    }
+}
+
+
+function updateUI(result) {
+
+    const statusElement =
+        document.getElementById("status");
+
+    const canInvoiceElement =
+        document.getElementById("canInvoice");
+
+    const odooCountElement =
+        document.getElementById("odooCount");
+
+    const redgpsCountElement =
+        document.getElementById("redgpsCount");
+
+    const differenceElement =
+        document.getElementById("difference");
+
+    const successAlert =
+        document.getElementById("successAlert");
+
+    const dangerAlert =
+        document.getElementById("dangerAlert");
+
+
+    const expectedAssets =
+        Number(result.expected_assets || 0);
+
+    const redgpsAssets =
+        Number(result.redgps_assets || 0);
+
+    const difference =
+        expectedAssets - redgpsAssets;
+
+
+    odooCountElement.textContent =
+        expectedAssets;
+
+    redgpsCountElement.textContent =
+        redgpsAssets;
+
+    differenceElement.textContent =
+        difference;
+
+
+    if (result.can_invoice) {
+
+        statusElement.className =
+            "status matched";
+
+        statusElement.textContent =
+            "VALIDADO";
+
+        canInvoiceElement.textContent =
+            "Sí";
+
+        successAlert.style.display =
+            "block";
+
+        dangerAlert.style.display =
+            "none";
+
+        successAlert.innerHTML = `
+            <strong>Conciliación correcta</strong>
+            ${escapeHtml(result.message)}
+        `;
+
+    }
+    else {
+
+        statusElement.className =
+            "status review";
+
+        statusElement.textContent =
+            "REQUIERE REVISIÓN";
+
+        canInvoiceElement.textContent =
+            "No";
+
+        successAlert.style.display =
+            "none";
+
+        dangerAlert.style.display =
+            "block";
+
+
+        const missingRedGps =
+            result.missing_in_redgps?.length
+                ? result.missing_in_redgps.join(", ")
+                : "Ninguno";
+
+        const missingOdoo =
+            result.missing_in_odoo?.length
+                ? result.missing_in_odoo.join(", ")
+                : "Ninguno";
+
+
+        dangerAlert.innerHTML = `
+            <strong>
+                ⚠ FACTURACIÓN BLOQUEADA
+            </strong>
+
+            ${escapeHtml(result.message)}
+
+            <br><br>
+
+            <b>Faltantes en RED GPS:</b>
+            ${escapeHtml(missingRedGps)}
+
+            <br>
+
+            <b>Faltantes en Odoo:</b>
+            ${escapeHtml(missingOdoo)}
+        `;
+    }
+}
+
+
+function showConnectionError(message) {
+
+    const statusElement =
+        document.getElementById("status");
+
+    const canInvoiceElement =
+        document.getElementById("canInvoice");
+
+    const successAlert =
+        document.getElementById("successAlert");
+
+    const dangerAlert =
+        document.getElementById("dangerAlert");
+
+
+    statusElement.className =
+        "status review";
+
+    statusElement.textContent =
+        "ERROR";
+
+    canInvoiceElement.textContent =
+        "No";
+
+    successAlert.style.display =
+        "none";
+
+    dangerAlert.style.display =
+        "block";
+
+    dangerAlert.innerHTML = `
+        <strong>
+            ⚠ ERROR DE INTEGRACIÓN
+        </strong>
+
+        No fue posible completar la consulta
+        contra TESLIAN CONNECT.
+
+        <br><br>
+
+        ${escapeHtml(message)}
+    `;
+}
+
+
+function setLoadingState(isLoading) {
+
+    const buttons =
+        document.querySelectorAll("button");
+
+    buttons.forEach(
+        button => {
+            button.disabled = isLoading;
+        }
+    );
+
+
+    if (isLoading) {
+
+        document.getElementById(
+            "status"
+        ).textContent = "CONSULTANDO...";
+
+    }
+}
+
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        String(value ?? "");
+
+    return div.innerHTML;
+}
+
+
+function validateRealMatch() {
+
+    reconcile(
+        payloadMatched
+    );
+}
+
+
+function validateRealMismatch() {
+
+    reconcile(
+        payloadMismatch
+    );
+}
+
+</script>
+
+</body>
+</html>

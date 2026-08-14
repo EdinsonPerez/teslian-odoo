@@ -1,4 +1,4 @@
-from odoo import fields, models, _
+from odoo import _, fields, models
 from odoo.exceptions import UserError
 
 from ..services.teslian_connect_client import (
@@ -62,6 +62,29 @@ class ResPartner(models.Model):
         readonly=True,
     )
 
+    teslian_odoo_asset_count = fields.Integer(
+        string="Activos operativos Odoo",
+        compute="_compute_teslian_odoo_asset_count",
+    )
+
+    teslian_redgps_asset_count = fields.Integer(
+        string="Activos RED GPS",
+        readonly=True,
+    )
+
+    teslian_reconciliation_difference = fields.Integer(
+        string="Diferencia de activos",
+        readonly=True,
+    )
+
+    def _compute_teslian_odoo_asset_count(self):
+        for partner in self:
+            partner.teslian_odoo_asset_count = len(
+                partner.teslian_asset_ids.filtered(
+                    lambda asset: asset.operational
+                )
+            )
+
     def action_teslian_reconcile(self):
         self.ensure_one()
 
@@ -116,7 +139,13 @@ class ResPartner(models.Model):
                 "teslian_last_reconciliation": (
                     fields.Datetime.now()
                 ),
-                "teslian_reconciliation_message": str(exc),
+                "teslian_reconciliation_message": (
+                    str(exc)
+                ),
+                "teslian_missing_in_redgps": False,
+                "teslian_missing_in_odoo": False,
+                "teslian_redgps_asset_count": 0,
+                "teslian_reconciliation_difference": 0,
             })
 
             raise UserError(
@@ -146,6 +175,25 @@ class ResPartner(models.Model):
             [],
         )
 
+        expected_assets = int(
+            result.get(
+                "expected_assets",
+                0,
+            )
+        )
+
+        redgps_assets = int(
+            result.get(
+                "redgps_assets",
+                0,
+            )
+        )
+
+        difference = (
+            expected_assets
+            - redgps_assets
+        )
+
         self.write({
             "teslian_billing_status": status,
             "teslian_can_invoice": can_invoice,
@@ -154,12 +202,25 @@ class ResPartner(models.Model):
             ),
             "teslian_reconciliation_message": (
                 result.get("message")
+                or ""
             ),
             "teslian_missing_in_redgps": (
-                ", ".join(missing_in_redgps)
+                ", ".join(
+                    str(item)
+                    for item in missing_in_redgps
+                )
             ),
             "teslian_missing_in_odoo": (
-                ", ".join(missing_in_odoo)
+                ", ".join(
+                    str(item)
+                    for item in missing_in_odoo
+                )
+            ),
+            "teslian_redgps_asset_count": (
+                redgps_assets
+            ),
+            "teslian_reconciliation_difference": (
+                difference
             ),
         })
 
@@ -173,11 +234,13 @@ class ResPartner(models.Model):
                     "Se requiere revisión manual.<br/><br/>"
                     "<b>Activos Odoo:</b> %s<br/>"
                     "<b>Activos RED GPS:</b> %s<br/>"
+                    "<b>Diferencia:</b> %s<br/>"
                     "<b>Faltantes en RED GPS:</b> %s<br/>"
                     "<b>Faltantes en Odoo:</b> %s"
                 ) % (
-                    result.get("expected_assets"),
-                    result.get("redgps_assets"),
+                    expected_assets,
+                    redgps_assets,
+                    difference,
                     missing_in_redgps or "-",
                     missing_in_odoo or "-",
                 )
@@ -188,7 +251,12 @@ class ResPartner(models.Model):
                 body=_(
                     "<b>TESLIAN CONNECT</b><br/>"
                     "Conciliación completada correctamente.<br/>"
+                    "<b>Activos Odoo:</b> %s<br/>"
+                    "<b>Activos RED GPS:</b> %s<br/>"
                     "Cliente habilitado para facturación."
+                ) % (
+                    expected_assets,
+                    redgps_assets,
                 )
             )
 
