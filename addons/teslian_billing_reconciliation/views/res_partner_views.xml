@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+    <record
+        id="view_partner_form_teslian_billing"
+        model="ir.ui.view"
+    >
+
+        <field name="name">
+            res.partner.form.teslian.billing
+        </field>
+
+        <field name="model">
+            res.partner
+        </field>
+
+        <field
+            name="inherit_id"
+            ref="base.view_partner_form"
+        />
+
+        <field name="arch" type="xml">
+
+            <xpath
+                expr="//notebook"
+                position="inside"
+            >
+
+                <page string="TESLIAN / RED GPS">
+
+                    <group>
+
+                        <group string="Integración">
+
+                            <field name="redgps_client_id"/>
+
+                            <field
+                                name="teslian_billing_status"
+                                readonly="1"
+                            />
+
+                            <field
+                                name="teslian_can_invoice"
+                                readonly="1"
+                            />
+
+                            <field
+                                name="teslian_last_reconciliation"
+                                readonly="1"
+                            />
+
+                        </group>
+
+
+                        <group string="Acciones">
+
+                            <button
+                                name="action_teslian_reconcile"
+                                type="object"
+                                string="Validar con RED GPS"
+                                class="btn-primary"
+                            />
+
+                        </group>
+
+                    </group>
+
+
+                    <group string="Resultado">
+
+                        <field
+                            name="teslian_reconciliation_message"
+                            readonly="1"
+                        />
+
+                        <field
+                            name="teslian_missing_in_redgps"
+                            readonly="1"
+                        />
+
+                        <field
+                            name="teslian_missing_in_odoo"
+                            readonly="1"
+                        />
+
+                    </group>
+
+
+                    <separator string="Activos operativos"/>
+
+                    <field name="teslian_asset_ids">
+
+                        <list editable="bottom">
+
+                            <field name="name"/>
+
+                            <field name="redgps_asset_id"/>
+
+                            <field name="imei"/>
+
+                            <field name="plate"/>
+
+                            <field name="operational"/>
+
+                        </list>
+
+                    </field>
+
+                </page>
+
+            </xpath>
+
+        </field>
+
+    </record>
+
+</odoo>

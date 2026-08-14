@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+
+    <record id="view_teslian_asset_list" model="ir.ui.view">
+        <field name="name">teslian.asset.list</field>
+        <field name="model">teslian.asset</field>
+        <field name="arch" type="xml">
+
+            <list string="Activos TESLIAN">
+
+                <field name="name"/>
+
+                <field name="partner_id"/>
+
+                <field name="redgps_asset_id"/>
+
+                <field name="imei"/>
+
+                <field name="plate"/>
+
+                <field name="operational"/>
+
+                <field name="last_reconciliation_status"/>
+
+                <field name="last_reconciliation_date"/>
+
+            </list>
+
+        </field>
+    </record>
+
+
+    <record id="view_teslian_asset_form" model="ir.ui.view">
+        <field name="name">teslian.asset.form</field>
+
+        <field name="model">
+            teslian.asset
+        </field>
+
+        <field name="arch" type="xml">
+
+            <form string="Activo TESLIAN">
+
+                <sheet>
+
+                    <group>
+
+                        <group string="Activo">
+
+                            <field name="name"/>
+
+                            <field name="partner_id"/>
+
+                            <field name="operational"/>
+
+                        </group>
+
+                        <group string="RED GPS">
+
+                            <field name="redgps_asset_id"/>
+
+                            <field name="imei"/>
+
+                            <field name="plate"/>
+
+                        </group>
+
+                    </group>
+
+
+                    <group string="Conciliación">
+
+                        <field
+                            name="last_reconciliation_status"
+                            readonly="1"
+                        />
+
+                        <field
+                            name="last_reconciliation_date"
+                            readonly="1"
+                        />
+
+                    </group>
+
+                </sheet>
+
+            </form>
+
+        </field>
+    </record>
+
+</odoo>

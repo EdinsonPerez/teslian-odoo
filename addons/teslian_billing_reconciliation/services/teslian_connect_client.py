@@ -85,4 +85,30 @@ class TeslianConnectClient:
                 "TESLIAN CONNECT devolvió una respuesta inesperada."
             )
 
+    @classmethod
+    def from_odoo_env(cls, env):
+        """
+        Construye el cliente utilizando parámetros
+        configurados dentro de Odoo.
+        """
+
+        config = env[
+            "ir.config_parameter"
+        ].sudo()
+
+        base_url = config.get_param(
+            "teslian_connect.base_url",
+            "http://127.0.0.1:8000",
+        )
+
+        api_key = config.get_param(
+            "teslian_connect.api_key",
+            "",
+        )
+
+        return cls(
+            base_url=base_url,
+            api_key=api_key or None,
+        )
+
         return result
