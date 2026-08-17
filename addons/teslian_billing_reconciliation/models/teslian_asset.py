@@ -1,3 +1,4 @@
+# pyright: reportMissingImports=false
 from odoo import api, fields, models
 
 

@@ -85,6 +85,52 @@ class ResPartner(models.Model):
                 )
             )
 
+
+    def write(self, vals):
+        """
+        Invalida la conciliación TESLIAN cuando cambia
+        información del cliente relevante para RED GPS.
+        """
+
+        reconciliation_fields = {
+            "redgps_client_id",
+            "active",
+        }
+
+        must_invalidate = bool(
+            reconciliation_fields.intersection(
+                vals.keys()
+            )
+        )
+
+        result = super().write(vals)
+
+        if must_invalidate:
+            reconciliation_values = {
+                "teslian_billing_status": "not_checked",
+                "teslian_can_invoice": False,
+                "teslian_last_reconciliation": False,
+                "teslian_reconciliation_message": (
+                    "La conciliación fue invalidada porque "
+                    "se modificó información del cliente "
+                    "relevante para RED GPS."
+                ),
+                "teslian_missing_in_redgps": False,
+                "teslian_missing_in_odoo": False,
+                "teslian_redgps_asset_count": 0,
+                "teslian_reconciliation_difference": 0,
+            }
+
+            super(
+                ResPartner,
+                self,
+            ).write(
+                reconciliation_values
+            )
+
+        return result
+
+
     def action_teslian_reconcile(self):
         self.ensure_one()
 
